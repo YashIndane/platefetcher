@@ -1,0 +1,178 @@
+.box1{
+    width: 99px;
+    height: 100px;
+    border: 1px solid white;
+    position: absolute;
+    top: 1400;
+    left: 1;
+}
+
+.box2{
+    width: 99px;
+    height: 100px;
+    border: 1px solid white;
+    position: absolute;
+    top: 1400;
+    left: 101;
+}
+  
+.box3{
+    width: 99px;
+    height: 100px;
+    border: 1px solid white;
+    position: absolute;
+    top: 1400;
+    left: 201;
+}
+  
+.box4{
+    width: 99px;
+    height: 100px;
+    border: 1px solid white;
+    position: absolute;
+    top: 1400;
+    left: 301;
+}
+  
+.box5{
+    width: 99px;
+    height: 100px;
+    border: 1px solid white;
+    position: absolute;
+    top: 1400;
+    left: 401;
+}
+  
+.box6{
+    width: 99px;
+    height: 100px;
+    border: 1px solid white;
+    position: absolute;
+    top: 1400;
+    left: 501;
+}
+  
+.box7{
+    width: 99px;
+    height: 100px;
+    border: 1px solid white;
+    position: absolute;
+    top: 1400;
+    left: 601;
+}
+  
+.box8{
+    width: 99px;
+    height: 100px;
+    border: 1px solid white;
+    position: absolute;
+    top: 1400;
+    left: 701;
+}
+  
+.box9{
+    width: 99px;
+    height: 100px;
+    border: 1px solid white;
+    position: absolute;
+    top: 1400;
+    left: 801;
+}
+  
+.box10{
+    width: 75px;
+    height: 100px;
+    border: 1px solid white;
+    position: absolute;
+    top: 1400;
+    left: 901;
+}
+  
+.box11{
+    width: 970px;
+    height: 0.5px;
+    border: 0.5px solid red;
+    position: absolute;
+    top: 1450;
+    left: 1;
+}
+
+.b1{
+    position: absolute;
+    top: 1275;
+    left: 10;
+    font-size: 100;
+    color: red;
+}
+
+.b2{
+    position: absolute;
+    top: 1275;
+    left: 121;
+    font-size: 100;
+    color: red;
+}
+
+.b3{
+    position: absolute;
+    top: 1275;
+    left: 220;
+    font-size: 100;
+    color: red;
+}
+
+.b4{
+    position: absolute;
+    top: 1275;
+    left: 319;
+    font-size: 100;
+    color: red;
+}
+
+.b5{
+    position: absolute;
+    top: 1275;
+    left: 418;
+    font-size: 100;
+    color: red;
+}
+
+.b6{
+    position: absolute;
+    top: 1275;
+    left: 517;
+    font-size: 100;
+    color: red;
+}
+
+.b7{
+    position: absolute;
+    top: 1275;
+    left: 616;
+    font-size: 100;
+    color: red;
+}
+
+.b8{
+    position: absolute;
+    top: 1275;
+    left: 715;
+    font-size: 100;
+    color: red;
+}
+
+.b9{
+    position: absolute;
+    top: 1275;
+    left: 814;
+    font-size: 100;
+    color: red;
+}
+
+.b10{
+    position: absolute;
+    top: 1275;
+    left: 913;
+    font-size: 100;
+    color: red;
+}

@@ -1,0 +1,18 @@
+#Ignore the Research paper
+research_paper.pdf
+
+#Ignore git and cache folders
+.git
+.cache
+
+#Ignore markdowns
+README.md
+
+#Ignore dockerignore itself
+.dockerignore
+
+#Ignore Dockerfile
+Dockerfile
+
+#Ignore LICENSE
+LICENSE
