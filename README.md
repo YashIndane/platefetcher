@@ -6,23 +6,23 @@ Scan the number plate and get all the details of the vehicle!
 
 ## Usage
 
-### 🛠️ Building the image
+### Building the image
 
 ```
 $ sudo docker build --platform linux/arm64/v8 -t <IMAGE-NAME> .
 ```
 
-### 🏃🏻‍♂️ Running the container
+### Running the container
 
 ```
 $ sudo podman run --platform linux/arm64/v8 -dit -p <PORT>:2400 --device /dev/video0 --name <NAME> \
        docker.io/yashindane/platefetch:arm64v8  --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
-       --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>"
+       --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
 ```
 
 ### Prerequisites
 
-Create a publically accessible bucket with the ```IAM``` user in AWS. The user must have ```PowerUser``` and ```AdminUser``` access.
+1. Create a publically accessible bucket with the ```IAM``` user in AWS. The user must have ```PowerUser``` and ```AdminUser``` access.
 
 Configure this bucket policy-
 
@@ -41,6 +41,8 @@ Configure this bucket policy-
   ]
 }
 ```
+
+2. Create a account on ```http://www.regcheck.org.uk``` and pass that username with ```--user=```
 
 ## Reference
 
