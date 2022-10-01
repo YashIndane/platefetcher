@@ -16,7 +16,7 @@ Usage-
 
   $ sudo podman run --platform linux/arm64/v8 -dit -p <PORT>:2400 --device /dev/video0 --name <NAME> \
     docker.io/yashindane/platefetch:arm64v8  --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
-    --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>"
+    --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
 
 
 Author: Yash Indane
@@ -26,11 +26,14 @@ Email:  yashindane46@gmail.com
 #Import libraries
 
 import cv2
+import json
 import boto3
 import subprocess
 import argparse
 import logging
-from flask import Flask, Response, render_template
+import requests
+import xmltodict
+from flask import Flask, Response, render_template, request
 
 
 app = Flask("PlateFetch")
@@ -39,13 +42,14 @@ app = Flask("PlateFetch")
 #Parsing keyword arguments
 def parseargs() -> None:
 
-    global DEFAULT_REGION, BUCKET
+    global DEFAULT_REGION, BUCKET, REG_CHECK_USER
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--aak", help="AWS access key", required=True)
     parser.add_argument("--ask", help="AWS secret key", required=True)
     parser.add_argument("--region", help="AWS default region", required=True)
     parser.add_argument("--bucketname", help="AWS bucket name", required=True)
+    parser.add_argument("--user", help="Reg Check API user", required=True)
 
     args = parser.parse_args()
 
@@ -53,6 +57,7 @@ def parseargs() -> None:
     AWS_SECRET_KEY = args.ask
     DEFAULT_REGION = args.region
     BUCKET = args.bucketname
+    REG_CHECK_USER = args.user
     
     #Write the default region and bucket name so that JS can use it
     with open("vals.txt", "w") as file:
@@ -166,7 +171,7 @@ def gen_stream():
             yield(b'--frame\r\n'
                  b'Content-Type: image/png\r\n\r\n'+frame+b'\r\n\r\n')
         except Exception as e:
-            print(e)
+            logging.error(e)
 
 
 #Writes the extracted numbers to number.txt file
@@ -175,6 +180,43 @@ def write_to_file(number:str) -> None:
     with open("number.txt", "w") as numfile:
         numfile.write(number)
     numfile.close()
+
+
+#This route used by JS to get the vehicle details
+@app.route("/fetchvehicle", methods=["GET"])
+def fvehicle() -> str:
+
+    try:
+
+        number = request.args.get("vnumber")
+        req = requests.get(f"http://www.regcheck.org.uk/api/reg.asmx/CheckIndia?RegistrationNumber={number}&username={REG_CHECK_USER}")
+        data = xmltodict.parse(req.content)
+        jdata = json.dumps(data)
+        df = json.loads(jdata)
+        df1 = json.loads(df["Vehicle"]["vehicleJson"])
+
+        details = [df1["Description"],
+                   df1["RegistrationYear"],
+                   df1["EngineSize"]["CurrentTextValue"],
+                   df1["NumberOfSeats"]["CurrentTextValue"],
+                   df1["VechileIdentificationNumber"],
+                   df1["EngineNumber"],
+                   df1["FuelType"]["CurrentTextValue"],
+                   df1["RegistrationDate"],
+                   df1["Location"]]
+
+        ret_string = ""
+        
+        for x in details:
+            if " " in str(x):
+                x = "-".join(str(x).split())
+            ret_string += str(x) + " " if str(x) else "-" + " "
+
+        return ret_string[:-1]
+
+    except Exception as e:
+        logging.error(e)
+        return "- - - - - - - - -"
 
 
 #This route used by JS function to read the number.txt file

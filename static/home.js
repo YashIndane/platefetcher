@@ -43,9 +43,64 @@ function updateImage(){
 }
 
 
+//Gets the vehicle details string and prints it
+function getVehicleDetails(plateNumber){
+    
+    var xhrd = new XMLHttpRequest();
+    var detailsQueryString = "/fetchvehicle?vnumber=" + plateNumber;
+    xhrd.open("GET", detailsQueryString, true);
+    xhrd.send();
+
+    xhrd.onload = function(){
+    
+        var detailsString = xhrd.responseText;
+	writeDetails(detailsString);
+	
+    }
+}
+
+
+//Writes the text in typewriter style
+function typeWriter(ID, text){
+
+    (async()=>{
+        spot = document.getElementById(ID);
+	for (var v = 0; v < text.length; v++){
+            spot.innerHTML += text.charAt(v);
+	    await sleep(15);
+	}
+
+    })()
+}
+
+
 const DEF_DELAY = 1000;
 function sleep(ms){
     return new Promise(resolve => setTimeout(resolve, ms || DEF_DELAY));
+}
+
+
+//Write vehicle details
+function writeDetails(details){
+
+    (async()=>{
+        
+        const ids = ["in1", "in2", "in3", "in4", "in5", "in6", "in7", "in8", "in9"];
+	const preText = ["", "Registration year: ", "Engine size: ", "Number of seats: ", "Vehicle ID: ", "Engine number: ", "Fuel type: ", "Registration date: ", "Location: "];
+	const vehicleDetails = details.split(" ");
+
+	for (var i = 0; i < ids.length; i++){
+       
+	    placeID = ids[i];
+	    var finText = preText[i] + vehicleDetails[i];
+            console.log(finText)		
+	    typeWriter(placeID, finText);
+	    await sleep(850);
+
+	}
+
+
+    })()
 }
 
 
@@ -91,8 +146,11 @@ function fun(a,b,c,d,e,f,g,h,i,j){
           
 
     })()
-
 }
+
+
+//This variable is used to avoid doing stuff for same plate number more than once
+var platenum = "";
 
 
 /*This function continously sends GET request to numberfetch API 
@@ -109,9 +167,14 @@ function fetchNumber(){
               var response = xhr.responseText;
               if (response === "0"){}
               else{
-                console.log(response);
-                updateImage();
-                fun(response.substr(0,1), response.substr(1,1), response.substr(2,1), response.substr(3,1), response.substr(4,1), response.substr(5,1), response.substr(6,1),response.substr(7,1),response.substr(8,1), response.substr(9,1));
+		if (platenum === response){}
+		else{      
+                    console.log(response);
+                    updateImage();
+                    fun(response.substr(0,1), response.substr(1,1), response.substr(2,1), response.substr(3,1), response.substr(4,1), response.substr(5,1), response.substr(6,1),response.substr(7,1),response.substr(8,1), response.substr(9,1));
+		    getVehicleDetails(response);
+		    platenum = response;
+	        }
               }
           }
 }
