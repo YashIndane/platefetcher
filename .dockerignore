@@ -16,3 +16,6 @@ Dockerfile
 
 #Ignore LICENSE
 LICENSE
+
+#Ignore Code Of Conduct
+CODE_OF_CONDUCT.md
