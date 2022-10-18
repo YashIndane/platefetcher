@@ -1,6 +1,25 @@
-## Platefetcher
+<div align="center">
 
-![](https://img.shields.io/badge/raspberrypi-4B-red?style=flat-square&logo=raspberrypi&logoColor=red) ![](https://img.shields.io/badge/python-3-red?style=flat-square&logo=python&logoColor=blue) ![](https://img.shields.io/badge/opencv-red?style=flat-square&logo=opencv&logoColor=purple) ![](https://img.shields.io/badge/flask-red?style=flat-square&logo=flask&logoColor=yellow) ![](https://img.shields.io/badge/aws-red?style=flat-square&logo=amazon&logoColor=green) ![](https://img.shields.io/badge/docker-red?style=flat-square&logo=docker&logoColor=black)
+   ![plateff](https://github.com/YashIndane/repo-images/blob/main/plateff.png)
+
+   
+
+   ![](https://img.shields.io/badge/raspberrypi-4B-red?style=flat-square&logo=raspberrypi&logoColor=red)
+   ![](https://img.shields.io/badge/python-3-red?style=flat-square&logo=python&logoColor=blue)
+   ![](https://img.shields.io/badge/opencv-red?style=flat-square&logo=opencv&logoColor=purple)
+   ![](https://img.shields.io/badge/flask-red?style=flat-square&logo=flask&logoColor=yellow)
+   ![](https://img.shields.io/badge/aws-red?style=flat-square&logo=amazon&logoColor=green)
+   ![](https://img.shields.io/badge/docker-red?style=flat-square&logo=docker&logoColor=black)
+   <br>
+   ![](https://img.shields.io/badge/podman-blue?style=flat-square&logo=podman&logoColor=purple)
+   ![](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+   ![](https://img.shields.io/badge/arm64-v8-yellow?style=flat-square&logo=arm)
+   ![](https://img.shields.io/badge/powered%20by-RPI%20OS-pink?style=flat-square)
+   
+</div>
+
+
+## Platefetcher
 
 Scan the number plate and get all the details of the vehicle!
 
@@ -43,6 +62,17 @@ Configure this bucket policy-
 ```
 
 2. Create a account on ```http://www.regcheck.org.uk``` and pass that username with ```--user=```
+
+## Working
+
+![dia](https://github.com/YashIndane/repo-images/blob/main/dia.png)
+
+1. Using image proccesing the region of interest, ie the plate is extracted.
+2. The detected plate image is uploaded to Amazon S3.
+3. AWS textract uses that image to extract the numbers.
+4. Raspberry Pi receives the extracted numbers.
+5. Using https://www.regcheck.org.uk API the Pi gets the vehical details using the plate number.
+6. The results are printed on the Phone.
 
 ## Reference
 
