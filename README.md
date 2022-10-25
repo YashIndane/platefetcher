@@ -1,6 +1,6 @@
 <div align="center">
 
-   ![plateff](https://github.com/YashIndane/repo-images/blob/main/plateff.png)
+   ![plateff](https://user-images.githubusercontent.com/53041219/196192426-ad2033d6-798e-4f6e-9e08-2f1d2d7ad0d7.png)
 
    
 
@@ -23,15 +23,21 @@
 
 Scan the number plate and get all the details of the vehicle!
 
+<div align="center">
+
+   ![](https://github.com/YashIndane/repo-images/blob/main/platefetcher-gif.gif) ![](https://github.com/YashIndane/repo-images/blob/main/ras1.png)
+   
+</div>
+
 ## Usage
 
-### Building the image
+### 🛠️ Building the image
 
 ```
 $ sudo docker build --platform linux/arm64/v8 -t <IMAGE-NAME> .
 ```
 
-### Running the container
+### ▶️ Running the container
 
 ```
 $ sudo podman run --platform linux/arm64/v8 -dit -p <PORT>:2400 --device /dev/video0 --name <NAME> \
@@ -65,7 +71,7 @@ Configure this bucket policy-
 
 ## Working
 
-![dia](https://github.com/YashIndane/repo-images/blob/main/dia.png)
+![dia](https://user-images.githubusercontent.com/53041219/196134284-fbabf6fb-1793-47c2-a190-ab565cff2233.png)
 
 1. Using image proccesing the region of interest, ie the plate is extracted.
 2. The detected plate image is uploaded to Amazon S3.
