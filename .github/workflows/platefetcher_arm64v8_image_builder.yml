@@ -1,0 +1,46 @@
+name: Docker Build/Publish Image 
+
+on:  
+  push:    
+    branches: [ main ]  
+    
+jobs:   
+
+  build:    
+    runs-on: ubuntu-22.04  
+    
+    env:      
+      DOCKER_REGISTRY: docker.io      
+      DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/demoplate   
+      DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_AT }}  
+      DOCKER_TARGET_PLATFORM: linux/arm64/v8  
+      
+    steps:   
+    
+    - name: Checkout the code       
+      uses: actions/checkout@v1  
+      
+    - name: Set up Docker Buildx      
+      uses: crazy-max/ghaction-docker-buildx@v1      
+      with:        
+        buildx-version: latest    
+        
+    - name: Prepare      
+      if: success()      
+      id: prepare      
+      run: |        
+      
+        echo "docker_platform=${DOCKER_TARGET_PLATFORM}" >> $GITHUB_OUTPUT
+        echo "docker_image=${DOCKER_REGISTRY}/${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
+        echo "version=${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
+        
+    - name: Docker Login      
+      if: success()      
+      run: |        
+        echo "${DOCKER_PASSWORD}" | docker login ${DOCKER_REGISTRY} --username "${DOCKER_USERNAME}" --password-stdin
+        
+    - name: Run Buildx (push image)      
+      if: success()      
+      run: |        
+        docker buildx build --platform ${{ steps.prepare.outputs.docker_platform }} -t ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }} --output type=image,push=true .
