@@ -39,15 +39,41 @@ $ sudo docker build --platform linux/arm64/v8 -t <IMAGE-NAME> .
 
 ### ▶️ Running the container
 
+#### Using podman
+
 ```
-$ sudo podman run --platform linux/arm64/v8 -dit -p <PORT>:2400 --device /dev/video0 --name <NAME> \
-       docker.io/yashindane/platefetch:arm64v8  --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
-       --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
+$ sudo podman run --network=host --platform linux/arm64/v8 -dit --device /dev/video0 --name <NAME> \
+  docker.io/yashindane/platefetch:arm64v8 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
+  --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
+```
+
+#### Using docker
+
+```
+$ sudo docker run --platform linux/arm64/v8 -dit -p <PORT>:2400 --device /dev/video0 --name <NAME> \
+  docker.io/yashindane/platefetch:arm64v8 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
+  --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
+       
 ```
 
 ### Prerequisites
 
-1. Create a publically accessible bucket with the ```IAM``` user in AWS. The user must have ```PowerUser``` and ```AdminUser``` access.
+1. Installing docker
+
+```
+$ sudo curl -fsSL https://get.docker.com -o docker-install.sh
+$ sh docker-install.sh
+$ sudo usermod -aG docker pi
+$ sudo reboot
+```
+
+2. Installing podman (optional)
+
+```
+$ sudo apt-get -y install podman
+```
+
+3. Create a publically accessible bucket with the ```IAM``` user in AWS. The user must have ```PowerUser``` and ```AdminUser``` access.
 
 Configure this bucket policy-
 
@@ -67,7 +93,7 @@ Configure this bucket policy-
 }
 ```
 
-2. Create a account on ```http://www.regcheck.org.uk``` and pass that username with ```--user=```
+4. Create a account on ```http://www.regcheck.org.uk``` and pass that username with ```--user=```
 
 ## Working
 
