@@ -41,6 +41,7 @@ import argparse
 import logging
 import requests
 import xmltodict
+import dbconnector
 from flask import Flask, Response, render_template, request
 
 
@@ -50,7 +51,7 @@ app = Flask("PlateFetch")
 #Parsing keyword arguments
 def parseargs() -> None:
 
-    global DEFAULT_REGION, BUCKET, REG_CHECK_USER
+    global DEFAULT_REGION, BUCKET, REG_CHECK_USER, db
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--aak", help="AWS access key", required=True)
@@ -58,6 +59,10 @@ def parseargs() -> None:
     parser.add_argument("--region", help="AWS default region", required=True)
     parser.add_argument("--bucketname", help="AWS bucket name", required=True)
     parser.add_argument("--user", help="Reg Check API user", required=True)
+    parser.add_argument("--dbhost", help="Host endpoint of DB instance", required=False)
+    parser.add_argument("--dbport", help="Port at which DB service running", required=False)
+    parser.add_argument("--dbuser", help="DB username", required=False)
+    parser.add_argument("--dbpass", help="DB password", required=False)
 
     args = parser.parse_args()
 
@@ -66,6 +71,11 @@ def parseargs() -> None:
     DEFAULT_REGION = args.region
     BUCKET = args.bucketname
     REG_CHECK_USER = args.user
+
+    DB_HOST = args.dbhost
+    DB_PORT = args.dbport
+    DB_USER = args.dbuser
+    DB_PASS = args.dbpass
     
     #Write the default region and bucket name so that JS can use it
     with open("vals.txt", "w") as file:
@@ -78,6 +88,19 @@ def parseargs() -> None:
     a, b = subprocess.getstatusoutput(f"aws configure set default.region {DEFAULT_REGION}")
 
     logging.info(f"AWS-CLI Configured, with default region : {DEFAULT_REGION}")
+
+    #Setting up db instance
+    db = dbconnector.DB_INSTANCE(
+         host=DB_HOST,
+         port=DB_PORT,
+         user=DB_USER,
+         password=DB_PASS
+    )
+
+    db.connectToInstance()
+    db.createDB()
+    db.createTable()
+
 
 
 #Extract the numbers from the plate
@@ -220,10 +243,22 @@ def fvehicle() -> str:
                 x = "-".join(str(x).split())
             ret_string += str(x) + " " if str(x) else "-" + " "
 
+        db.connectToInstance()
+        
+        #Inserting data to db
+        db.insertData(f"{number} {ret_string[:-1]}")
+
         return ret_string[:-1]
 
     except Exception as e:
+
         logging.error(e)
+
+        db.connectToInstance()
+
+        #Inserting data to db
+        db.insertData(f"{number} - - - - - - - - -")
+
         return "- - - - - - - - -"
 
 
