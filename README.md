@@ -47,6 +47,15 @@ $ sudo podman run --network=host --platform linux/arm64/v8 -dit --device /dev/vi
   --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
 ```
 
+### Optional arguments
+
+| Argument | Description |
+| --- | --- |
+| `--dbhost` | Host endpoint of DB instance |
+| `--dbport` | Port at which DB service running |
+| `--dbuser` | DB username |
+| `--dbpass` | DB password |
+
 #### Using docker
 
 ```
@@ -67,7 +76,7 @@ $ sudo usermod -aG docker pi
 $ sudo reboot
 ```
 
-2. Installing podman (optional)
+2. (optional) Installing podman
 
 ```
 $ sudo apt-get -y install podman
@@ -94,6 +103,8 @@ Configure this bucket policy-
 ```
 
 4. Create a account on ```http://www.regcheck.org.uk``` and pass that username with ```--user=```
+
+5. (optional) Creating a mysql DB instance for all plate details to store in
 
 ## Working
 
