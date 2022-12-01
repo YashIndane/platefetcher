@@ -26,6 +26,8 @@ Usage-
       docker.io/yashindane/platefetch:arm64v8 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
       --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
 
+  Check for other optional arguments regarding database in README.md
+
 
 Author: Yash Indane
 Email:  yashindane46@gmail.com
