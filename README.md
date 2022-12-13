@@ -63,7 +63,6 @@ $ sudo podman run --network=host --platform linux/arm64/v8 -dit --device /dev/vi
 $ sudo docker run --platform linux/arm64/v8 -dit -p <PORT>:2400 --device /dev/video0 --name <NAME> \
   docker.io/yashindane/platefetch:arm64v8 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
   --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
-       
 ```
 
 ### Prerequisites
