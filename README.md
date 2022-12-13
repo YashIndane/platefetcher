@@ -25,7 +25,8 @@ Scan the number plate and get all the details of the vehicle!
 
 <div align="center">
 
-   ![](https://github.com/YashIndane/repo-images/blob/main/platefetcher-gif.gif) ![](https://github.com/YashIndane/repo-images/blob/main/ras1.png)
+  ![platefetcher-gif](https://user-images.githubusercontent.com/53041219/207283343-5f3e9cdc-61d8-41bd-89c0-9b540d6b7570.gif) ![ras1](https://user-images.githubusercontent.com/53041219/207283447-a2d95a6e-ca48-423f-8394-ed59ca94160f.png)
+
    
 </div>
 
