@@ -38,6 +38,12 @@ Scan the number plate and get all the details of the vehicle!
 $ sudo docker build --platform linux/arm64/v8 -t <IMAGE-NAME> .
 ```
 
+### Pulling the image
+
+```
+$ sudo podman/docker pull --platform linux/arm64/v8 docker.io/yashindane/platefetch:arm64v8
+```
+
 ### ▶️ Running the container
 
 #### Using podman
@@ -46,6 +52,14 @@ $ sudo docker build --platform linux/arm64/v8 -t <IMAGE-NAME> .
 $ sudo podman run --network=host --platform linux/arm64/v8 -dit --device /dev/video0 --name <NAME> \
   docker.io/yashindane/platefetch:arm64v8 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
   --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
+```
+
+#### Using docker
+
+```
+$ sudo docker run --platform linux/arm64/v8 -dit -p <PORT>:2400 --device /dev/video0 --name <NAME> \
+  docker.io/yashindane/platefetch:arm64v8 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
+  --region="<DEFAULT_REGION>" --bucket_name="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
 ```
 
 ### Optional arguments
@@ -57,13 +71,13 @@ $ sudo podman run --network=host --platform linux/arm64/v8 -dit --device /dev/vi
 | `--dbuser` | DB username |
 | `--dbpass` | DB password |
 
-#### Using docker
+### Access
 
-```
-$ sudo docker run --platform linux/arm64/v8 -dit -p <PORT>:2400 --device /dev/video0 --name <NAME> \
-  docker.io/yashindane/platefetch:arm64v8 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
-  --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
-```
+| Tool | Path |
+| --- | --- |
+| `podman` | http://IP:2400/out |
+| `docker` | http://IP:PORT/out |
+
 
 ### Prerequisites
 
@@ -82,7 +96,15 @@ $ sudo reboot
 $ sudo apt-get -y install podman
 ```
 
-3. Create a publically accessible bucket with the ```IAM``` user in AWS. The user must have ```PowerUser``` and ```AdminUser``` access.
+3. (optional) Installing terraform
+
+```
+$ sudo wget https://releases.hashicorp.com/terraform/1.3.7/terraform_1.3.7_linux_arm64.zip
+$ sudo unzip <ZIPFILE>
+$ sudo mv terraform /usr/bin/
+```
+
+4. Create a publically accessible bucket with the ```IAM``` user in AWS. The user must have ```PowerUser``` and ```AdminUser``` access.
 
 Configure this bucket policy-
 
@@ -102,9 +124,19 @@ Configure this bucket policy-
 }
 ```
 
-4. Create a account on ```http://www.regcheck.org.uk``` and pass that username with ```--user=```
+5. Create a account on http://www.regcheck.org.uk and pass that username with ```--user=```.
 
-5. (optional) Creating a mysql DB instance for all plate details to store in
+6. (optional) Creating a mysql DB instance for all plate details to store in.
+
+7. (optional) Creating the DB and S3 bucket using terraform
+
+Navigate to ```infra-provisioning``` directory and run - 
+
+```
+$ sudo terraform init
+$ sudo terraform apply -var="access_key=<AWS_ACCESS_KEY>" -var="secret_key=<AWS_SECRET_KEY>" -var="bucket_name=<S3_BUCKET_NAME>" \
+  -var="identifier=<DB_IDENTIFIER>" -var="db_username=<DB_USERNAME>" -var="db_pass=<DB_PASSWORD>"
+```
 
 ## Working
 
