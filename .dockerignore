@@ -19,3 +19,6 @@ LICENSE
 
 #Ignore Code Of Conduct
 CODE_OF_CONDUCT.md
+
+#Ignore terraform code
+infra-provisioning/
