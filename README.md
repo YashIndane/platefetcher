@@ -4,17 +4,19 @@
 
    
 
-   ![](https://img.shields.io/badge/raspberrypi-4B-red?style=flat-square&logo=raspberrypi&logoColor=red)
-   ![](https://img.shields.io/badge/python-3-red?style=flat-square&logo=python&logoColor=blue)
-   ![](https://img.shields.io/badge/opencv-red?style=flat-square&logo=opencv&logoColor=purple)
-   ![](https://img.shields.io/badge/flask-red?style=flat-square&logo=flask&logoColor=yellow)
-   ![](https://img.shields.io/badge/aws-red?style=flat-square&logo=amazon&logoColor=green)
-   ![](https://img.shields.io/badge/docker-red?style=flat-square&logo=docker&logoColor=black)
+   ![](https://img.shields.io/badge/raspberrypi-4B-red?logo=raspberrypi&logoColor=red)
+   ![](https://img.shields.io/badge/python-3-red?logo=python&logoColor=blue)
+   ![](https://img.shields.io/badge/opencv-red?logo=opencv&logoColor=purple)
+   ![](https://img.shields.io/badge/flask-red?logo=flask&logoColor=yellow)
+   ![](https://img.shields.io/badge/aws-red?logo=amazon&logoColor=green)
+   ![](https://img.shields.io/badge/docker-red?logo=docker&logoColor=black)
    <br>
-   ![](https://img.shields.io/badge/podman-blue?style=flat-square&logo=podman&logoColor=purple)
-   ![](https://img.shields.io/badge/License-MIT-green?style=flat-square)
-   ![](https://img.shields.io/badge/arm64-v8-yellow?style=flat-square&logo=arm)
-   ![](https://img.shields.io/badge/powered%20by-RPI%20OS-pink?style=flat-square)
+   ![](https://img.shields.io/badge/podman-blue?logo=podman&logoColor=purple)
+   ![](https://img.shields.io/badge/License-MIT-green)
+   ![](https://img.shields.io/badge/arm64-v8-yellow?logo=arm)
+   ![](https://img.shields.io/badge/powered%20by-RPI%20OS-pink)
+   <br>
+   [![Docker Build/Publish Image](https://github.com/YashIndane/platefetcher/actions/workflows/platefetcher_arm64v8_image_builder.yml/badge.svg)](https://github.com/YashIndane/platefetcher/actions/workflows/platefetcher_arm64v8_image_builder.yml)
    
 </div>
 
