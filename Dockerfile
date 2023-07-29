@@ -1,6 +1,8 @@
-FROM docker.io/arm64v8/amazonlinux:latest
+#Dockerfile for platefetcher
 
-MAINTAINER Yash Indane
+FROM docker.io/yashindane/demoplate-base:v1
+
+MAINTAINER Yash Indane <yashindane46@gmail.com>
 
 LABEL platform="linux/arm64/v8" version="arm64v8"
 
