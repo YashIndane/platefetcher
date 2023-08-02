@@ -26,9 +26,7 @@ resource "aws_s3_bucket_policy" "Public_access_to_bucket" {
         "Principal": "*",
         "Action": "s3:*",
         "Resource": "${aws_s3_bucket.platfetcher-buck.arn}/*"
-
       }
-
     ]
   }
   EOF
