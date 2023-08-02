@@ -43,7 +43,7 @@ $ sudo docker build --platform linux/arm64/v8 -t <IMAGE-NAME> .
 ### Pulling the image
 
 ```
-$ sudo podman/docker pull --platform linux/arm64/v8 docker.io/yashindane/demoplate:latest
+$ sudo podman/docker pull --platform linux/arm64/v8 docker.io/yashindane/demoplate:10
 ```
 
 ### ▶️ Running the container
@@ -52,7 +52,7 @@ $ sudo podman/docker pull --platform linux/arm64/v8 docker.io/yashindane/demopla
 
 ```
 $ sudo podman run --network=host --platform linux/arm64/v8 -dit --device /dev/video0 --name <NAME> \
-  docker.io/yashindane/demoplate:latest --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
+  docker.io/yashindane/demoplate:10 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
   --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
 ```
 
@@ -60,18 +60,18 @@ $ sudo podman run --network=host --platform linux/arm64/v8 -dit --device /dev/vi
 
 ```
 $ sudo docker run --platform linux/arm64/v8 -dit -p <PORT>:2400 --device /dev/video0 --name <NAME> \
-  docker.io/yashindane/demoplate:latest --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
-  --region="<DEFAULT_REGION>" --bucket_name="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
+  docker.io/yashindane/demoplate:10 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
+  --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
 ```
 
 ### Optional arguments
 
 | Argument | Description |
 | --- | --- |
-| `--dbhost` | Host endpoint of DB instance |
-| `--dbport` | Port at which DB service running |
-| `--dbuser` | DB username |
-| `--dbpass` | DB password |
+| `--dbhost` | Host endpoint of DB instance (String) |
+| `--dbport` | Port at which DB service running (String) |
+| `--dbuser` | DB username (String) |
+| `--dbpass` | DB password min 8 characters (String) |
 
 ### Access
 
@@ -132,12 +132,14 @@ Configure this bucket policy-
 
 7. (optional) Creating the DB and S3 bucket using terraform
 
-Navigate to ```infra-provisioning``` directory and run - 
+(optional) Navigate to ```infra-provisioning``` directory and run below to create DB instance and S3 bucket -
 
 ```
 $ sudo terraform init
+$ sudo terraform validate
+$ sudo terraform plan
 $ sudo terraform apply -var="access_key=<AWS_ACCESS_KEY>" -var="secret_key=<AWS_SECRET_KEY>" -var="bucket_name=<S3_BUCKET_NAME>" \
-  -var="identifier=<DB_IDENTIFIER>" -var="db_username=<DB_USERNAME>" -var="db_pass=<DB_PASSWORD>"
+  -var="identifier=<DB_IDENTIFIER>" -var="db_username=<DB_USERNAME>" -var="db_pass=<DB_PASSWORD>" --auto-approve
 ```
 
 ## Working
