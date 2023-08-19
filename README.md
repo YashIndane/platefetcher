@@ -43,7 +43,7 @@ $ sudo docker build --platform linux/arm64/v8 -t <IMAGE-NAME> .
 ### Pulling the image
 
 ```
-$ sudo podman/docker pull --platform linux/arm64/v8 docker.io/yashindane/demoplate:10
+$ sudo podman/docker pull --platform linux/arm64/v8 docker.io/yashindane/demoplate:11
 ```
 
 ### ▶️ Running the container
@@ -52,7 +52,7 @@ $ sudo podman/docker pull --platform linux/arm64/v8 docker.io/yashindane/demopla
 
 ```
 $ sudo podman run --network=host --platform linux/arm64/v8 -dit --device /dev/video0 --name <NAME> \
-  docker.io/yashindane/demoplate:10 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
+  docker.io/yashindane/demoplate:11 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
   --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
 ```
 
@@ -60,7 +60,7 @@ $ sudo podman run --network=host --platform linux/arm64/v8 -dit --device /dev/vi
 
 ```
 $ sudo docker run --platform linux/arm64/v8 -dit -p <PORT>:2400 --device /dev/video0 --name <NAME> \
-  docker.io/yashindane/demoplate:10 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
+  docker.io/yashindane/demoplate:11 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
   --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
 ```
 

@@ -1,3 +1,5 @@
+#Workflow to build the docker image and push it to DockerHub and GHCR
+
 name: Docker Build/Publish Image 
 
 on:  
@@ -6,19 +8,31 @@ on:
     
 jobs:   
 
-  build:    
-    runs-on: ubuntu-22.04  
+  build:
+
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write 
     
-    env:      
+    env:
+      #DockerHub
       DOCKER_REGISTRY: docker.io      
-      DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/demoplate   
+      DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/demoplate
       DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_AT }}  
-      DOCKER_TARGET_PLATFORM: linux/arm64/v8  
+      DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_AT }}
+
+      #Github Container Repo
+      GHCR_REGISTRY: ghcr.io
+      GHCR_IMAGE: ${{ github.repository }}
+      GHCR_USERNAME: ${{ github.actor }}
+      GHCR_PASSWORD: ${{ secrets.TOK }}
+
+      TARGET_PLATFORM: linux/arm64/v8  
       
     steps:   
     
-    - name: Checkout the code       
+    - name: Checkout The Code       
       uses: actions/checkout@v1  
       
     - name: Set up Docker Buildx      
@@ -31,16 +45,31 @@ jobs:
       id: prepare      
       run: |        
       
-        echo "docker_platform=${DOCKER_TARGET_PLATFORM}" >> $GITHUB_OUTPUT
-        echo "docker_image=${DOCKER_REGISTRY}/${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
+        echo "platform=${TARGET_PLATFORM}" >> $GITHUB_OUTPUT
+        echo "docker_image_tag=${DOCKER_REGISTRY}/${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
+        echo "ghcr_image_tag=${GHCR_REGISTRY}/${GHCR_IMAGE}" >> $GITHUB_OUTPUT
         echo "version=${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
         
-    - name: Docker Login      
+    #DockerHub
+    - name: Docker Login To DockerHub
       if: success()      
       run: |        
         echo "${DOCKER_PASSWORD}" | docker login ${DOCKER_REGISTRY} --username "${DOCKER_USERNAME}" --password-stdin
         
-    - name: Run Buildx (push image)      
+    #DockerHub
+    - name: Run Buildx (push image to DockerHub)      
       if: success()      
       run: |        
-        docker buildx build --platform ${{ steps.prepare.outputs.docker_platform }} -t ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }} --output type=image,push=true .
+        docker buildx build --platform ${{ steps.prepare.outputs.platform }} -t ${{ steps.prepare.outputs.docker_image_tag }}:${{ steps.prepare.outputs.version }} --output type=image,push=true .
+
+    #GHCR
+    - name: Docker Login To GHCR
+      if: success()
+      run: |
+        echo "${GHCR_PASSWORD}" | docker login ${GHCR_REGISTRY} --username "${GHCR_USERNAME}" --password-stdin
+
+    #GHCR
+    - name: Run Buildx (push image to GHCR)
+      if: success()
+      run: |
+        docker buildx build --platform ${{ steps.prepare.outputs.platform }} -t ${{ steps.prepare.outputs.ghcr_image_tag }}:${{ steps.prepare.outputs.version }} --output type=image,push=true .
