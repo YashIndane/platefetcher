@@ -24,7 +24,7 @@ jobs:
 
       #Github Container Repo
       GHCR_REGISTRY: ghcr.io
-      GHCR_IMAGE: ${{ github.repository }}
+      GHCR_IMAGE: yashindane/platefetcher
       GHCR_USERNAME: ${{ github.actor }}
       GHCR_PASSWORD: ${{ secrets.TOK }}
 
