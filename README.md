@@ -139,7 +139,7 @@ $ sudo terraform init
 $ sudo terraform validate
 $ sudo terraform plan
 $ sudo terraform apply -var="access_key=<AWS_ACCESS_KEY>" -var="secret_key=<AWS_SECRET_KEY>" -var="bucket_name=<S3_BUCKET_NAME>" \
-  -var="identifier=<DB_IDENTIFIER>" -var="db_username=<DB_USERNAME>" -var="db_pass=<DB_PASSWORD>" --auto-approve
+  -var="identifier=<DB_IDENTIFIER>" -var="db_username=<DB_USERNAME>" -var="db_pass=<DB_PASSWORD>" -auto-approve
 ```
 
 ## Working
