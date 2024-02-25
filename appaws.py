@@ -94,7 +94,7 @@ def parseargs() -> None:
     #Setting up db instance
     db = dbconnector.DB_INSTANCE(
          host=DB_HOST,
-         port=DB_PORT,
+         port=int(DB_PORT),
          user=DB_USER,
          password=DB_PASS
     )

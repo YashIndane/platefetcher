@@ -10,7 +10,7 @@ import mysql.connector
 logging.basicConfig(level=logging.NOTSET)
 
 class DB_INSTANCE:
-    def __init__(self, host:str, port:str, user:str, password:str) -> None:
+    def __init__(self, host:str, port:int, user:str, password:str) -> None:
         self.host = host
         self.port = port
         self.user = user
