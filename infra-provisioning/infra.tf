@@ -30,6 +30,10 @@ resource "aws_s3_bucket_policy" "Public_access_to_bucket" {
     ]
   }
   EOF
+ 
+  depends_on = [
+     aws_s3_bucket_public_access_block.s3_public_access 
+  ]
 }
 
 #Creating RDS instance
