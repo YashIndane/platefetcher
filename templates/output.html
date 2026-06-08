@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Vehicle Details</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:       #0a0c10;
+      --card:     #12151c;
+      --card2:    #181c26;
+      --border:   rgba(255,255,255,0.06);
+      --accent:   #00e5a0;
+      --accent2:  #0091ff;
+      --danger:   #ff4d6d;
+      --text:     #eef0f6;
+      --muted:    #5a6277;
+      --muted2:   #8892a4;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100svh;
+      padding: 0 0 48px;
+      overflow-x: hidden;
+    }
+
+    /* Ambient glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse, rgba(0,229,160,0.05) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 18px; }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 26px 0 20px;
+    }
+
+    .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.1em;
+      background: linear-gradient(120deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--muted2);
+      text-decoration: none;
+      padding: 7px 14px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .back-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+    /* ── Hero card ── */
+    .hero {
+      background: linear-gradient(135deg, var(--card2) 0%, #1a1f2e 100%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px 24px 24px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 180px; height: 180px;
+      background: radial-gradient(circle, rgba(0,229,160,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .vehicle-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(0,229,160,0.1);
+      border: 1px solid rgba(0,229,160,0.2);
+      border-radius: 100px;
+      padding: 4px 12px;
+      margin-bottom: 14px;
+    }
+
+    .vehicle-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.2rem, 8vw, 2.8rem);
+      letter-spacing: 0.05em;
+      line-height: 1;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .vehicle-variant {
+      font-size: 0.85rem;
+      color: var(--muted2);
+      font-weight: 300;
+      margin-bottom: 22px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .stat {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 3px;
+    }
+
+    .stat-label {
+      font-size: 0.62rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 500;
+    }
+
+    /* ── Section cards ── */
+    .section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .section:nth-child(2) { animation-delay: 0.07s; }
+    .section:nth-child(3) { animation-delay: 0.14s; }
+    .section:nth-child(4) { animation-delay: 0.21s; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-icon {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.1em;
+      color: var(--muted2);
+    }
+
+    /* Rows */
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 20px;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .row:last-child { border-bottom: none; }
+
+    .row-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 400;
+      flex-shrink: 0;
+    }
+
+    .row-value {
+      font-size: 0.85rem;
+      color: var(--text);
+      font-weight: 500;
+      text-align: right;
+      word-break: break-all;
+    }
+
+    .row-value.null-val {
+      color: var(--muted);
+      font-style: italic;
+      font-weight: 300;
+      font-size: 0.8rem;
+    }
+
+    /* Status pills */
+    .pill {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 100px;
+      letter-spacing: 0.03em;
+    }
+
+    .pill-green { background: rgba(0,229,160,0.12); color: var(--accent); border: 1px solid rgba(0,229,160,0.2); }
+    .pill-red   { background: rgba(255,77,109,0.12); color: var(--danger); border: 1px solid rgba(255,77,109,0.2); }
+    .pill-blue  { background: rgba(0,145,255,0.12); color: var(--accent2); border: 1px solid rgba(0,145,255,0.2); }
+
+    /* Scan another btn */
+    .scan-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #0a0c10;
+      border: none;
+      border-radius: 16px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      text-decoration: none;
+      margin-top: 6px;
+      box-shadow: 0 4px 24px rgba(0,229,160,0.2);
+      transition: filter 0.2s, box-shadow 0.2s, transform 0.15s;
+      animation: fadeUp 0.5s 0.3s ease both;
+    }
+    .scan-btn:hover { filter: brightness(1.08); box-shadow: 0 6px 32px rgba(0,229,160,0.3); }
+    .scan-btn:active { transform: scale(0.98); }
+
+    /* Fitness expiry check */
+    .expiry-ok   { color: var(--accent); }
+    .expiry-warn { color: #f59e0b; }
+    .expiry-exp  { color: var(--danger); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <span class="brand">PlateScan</span>
+    <a href="/platescan" class="back-btn">
+      <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Scan Again
+    </a>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="vehicle-type-badge">
+      <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
+      <span id="heroVehicleType">Motor Vehicle</span>
+    </div>
+    <div class="vehicle-name" id="heroName">—</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.15em;color:#0a0c10;background:linear-gradient(120deg,var(--accent),var(--accent2));padding:3px 14px;border-radius:6px;">{{ regnum }}</span>
+    </div>
+    <div class="vehicle-variant" id="heroVariant">—</div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-value" id="statYear">—</div>
+        <div class="stat-label">Reg. Year</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="statFuel">—</div>
+        <div class="stat-label">Fuel</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="statCC">—</div>
+        <div class="stat-label">Engine CC</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Registration Details -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(0,145,255,0.1);">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#0091ff" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+      </div>
+      <span class="section-title">Registration</span>
+    </div>
+    <div class="row"><span class="row-label">Registration Date</span><span class="row-value" id="regDate">—</span></div>
+    <div class="row"><span class="row-label">Registration Year</span><span class="row-value" id="regYear">—</span></div>
+    <div class="row"><span class="row-label">Location / RTO</span><span class="row-value" id="regLocation">—</span></div>
+    <div class="row"><span class="row-label">Owner</span><span class="row-value" id="regOwner">—</span></div>
+    <div class="row"><span class="row-label">VIN</span><span class="row-value" id="regVin">—</span></div>
+  </div>
+
+  <!-- Engine Details -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(0,229,160,0.1);">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#00e5a0" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+        </svg>
+      </div>
+      <span class="section-title">Engine & Body</span>
+    </div>
+    <div class="row"><span class="row-label">Engine Size</span><span class="row-value" id="engSize">—</span></div>
+    <div class="row"><span class="row-label">Engine Number</span><span class="row-value" id="engNumber">—</span></div>
+    <div class="row"><span class="row-label">Fuel Type</span><span class="row-value" id="engFuel">—</span></div>
+    <div class="row"><span class="row-label">Number of Seats</span><span class="row-value" id="engSeats">—</span></div>
+    <div class="row"><span class="row-label">Vehicle Type</span><span class="row-value" id="engType">—</span></div>
+  </div>
+
+  <!-- Compliance -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(255,77,109,0.1);">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#ff4d6d" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+      </div>
+      <span class="section-title">Compliance</span>
+    </div>
+    <div class="row"><span class="row-label">Fitness</span><span class="row-value" id="compFitness">—</span></div>
+    <div class="row"><span class="row-label">Insurance</span><span class="row-value" id="compInsurance">—</span></div>
+    <div class="row"><span class="row-label">PUCC</span><span class="row-value" id="compPucc">—</span></div>
+  </div>
+
+  <a href="/platescan" class="scan-btn">
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h1l2-3h8l2 3h1a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+      <circle cx="12" cy="13" r="3"/>
+    </svg>
+    Scan Another Plate
+  </a>
+
+</div>
+
+<script>
+  // ── Injected by Flask via Jinja2 ──
+  const vehicle = {{ vehicle | tojson }};
+
+  function val(v) { return (v && v !== "01/01/0001" && v !== "1") ? v : null; }
+
+  function renderValue(el, v, formatter) {
+    const display = formatter ? formatter(v) : val(v);
+    if (!display) {
+      el.textContent = "N/A";
+      el.classList.add("null-val");
+    } else if (typeof display === "string") {
+      el.textContent = display;
+    } else {
+      el.innerHTML = "";
+      el.appendChild(display);
+    }
+  }
+
+  function pill(text, type) {
+    const s = document.createElement("span");
+    s.className = `pill pill-${type}`;
+    s.textContent = text;
+    return s;
+  }
+
+  function fitnessFormat(dateStr) {
+    if (!dateStr || dateStr === "01/01/0001") return null;
+    return dateStr;
+  }
+
+  function insuranceFormat(dateStr) {
+    if (!dateStr || dateStr === "01/01/0001") return null;
+    // Check if expired
+    try {
+      const parts = dateStr.split(/[\/\- ]/);
+      // Handle "DD/MM/YYYY" or "DD-MM-YYYY HH:MM:SS"
+      const d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+      const now = new Date();
+      if (d < now) return pill("Expired — " + dateStr, "red");
+      return pill("Valid — " + dateStr, "green");
+    } catch { return dateStr; }
+  }
+
+  // ── Hero ──
+  document.getElementById("heroName").textContent       = val(vehicle["Description"]) || "Unknown Vehicle";
+  document.getElementById("heroVariant").textContent    = val(vehicle["Variant"]) || "Standard";
+  document.getElementById("heroVehicleType").textContent = val(vehicle["Vehicle Type"]) || "Motor Vehicle";
+  document.getElementById("statYear").textContent       = (val(vehicle["Registration Year"]) && vehicle["Registration Year"] !== "1") ? vehicle["Registration Year"] : "—";
+  document.getElementById("statFuel").textContent       = val(vehicle["Fuel Type"]) || "—";
+  document.getElementById("statCC").textContent         = val(vehicle["Engine Size"]) ? vehicle["Engine Size"] + " cc" : "—";
+
+  // ── Registration ──
+  renderValue(document.getElementById("regDate"),     vehicle["Registration Date"]);
+  renderValue(document.getElementById("regYear"),     vehicle["Registration Year"], v => (v && v !== "1") ? v : null);
+  renderValue(document.getElementById("regLocation"), vehicle["Location"]);
+  renderValue(document.getElementById("regOwner"),    vehicle["Owner"]);
+  renderValue(document.getElementById("regVin"),      vehicle["VIN"]);
+
+  // ── Engine ──
+  renderValue(document.getElementById("engSize"),     vehicle["Engine Size"], v => val(v) ? v + " cc" : null);
+  renderValue(document.getElementById("engNumber"),   vehicle["Engine Number"]);
+  renderValue(document.getElementById("engFuel"),     vehicle["Fuel Type"]);
+  renderValue(document.getElementById("engSeats"),    vehicle["Number of Seats"]);
+  renderValue(document.getElementById("engType"),     vehicle["Vehicle Type"]);
+
+  // ── Compliance ──
+  renderValue(document.getElementById("compFitness"),  vehicle["Fitness"],   fitnessFormat);
+  renderValue(document.getElementById("compInsurance"), vehicle["Insurance"], insuranceFormat);
+  renderValue(document.getElementById("compPucc"),     vehicle["PUCC"]);
+</script>
+</body>
+</html>

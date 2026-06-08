@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Plate Capture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --surface: #161a23;
+      --surface2: #1e2330;
+      --border: rgba(255,255,255,0.07);
+      --accent: #00e5a0;
+      --accent2: #0091ff;
+      --text: #f0f2f7;
+      --muted: #6b7280;
+      --danger: #ff4d6d;
+      --radius: 20px;
+      --snap-red: #ff4d6d;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -30%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(0,229,160,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 430px;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      padding: 0 0 32px;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 24px 16px;
+    }
+
+    .brand {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(120deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* ── Viewfinder ── */
+    .viewfinder-wrap {
+      position: relative;
+      margin: 0 20px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #000;
+      aspect-ratio: 4/3;
+      flex-shrink: 0;
+    }
+
+    .viewfinder-wrap::before,
+    .viewfinder-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* Corner bracket overlay */
+    .corner-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .corner {
+      position: absolute;
+      width: 28px; height: 28px;
+      border-color: var(--accent);
+      border-style: solid;
+      border-width: 0;
+    }
+    .corner.tl { top: 14px; left: 14px; border-top-width: 2.5px; border-left-width: 2.5px; border-radius: 4px 0 0 0; }
+    .corner.tr { top: 14px; right: 14px; border-top-width: 2.5px; border-right-width: 2.5px; border-radius: 0 4px 0 0; }
+    .corner.bl { bottom: 14px; left: 14px; border-bottom-width: 2.5px; border-left-width: 2.5px; border-radius: 0 0 0 4px; }
+    .corner.br { bottom: 14px; right: 14px; border-bottom-width: 2.5px; border-right-width: 2.5px; border-radius: 0 0 4px 0; }
+
+    /* Scan line animation */
+    .scan-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      z-index: 3;
+      animation: scan 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes scan {
+      0% { top: 10%; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: 90%; opacity: 0; }
+    }
+
+    #camera, #canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    #canvas { display: none; position: absolute; inset: 0; }
+
+    .cam-error {
+      display: none;
+      position: absolute;
+      inset: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .cam-error svg { opacity: 0.4; }
+
+    /* Flash effect */
+    .flash-overlay {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+      z-index: 10;
+      pointer-events: none;
+      border-radius: var(--radius);
+      transition: opacity 0.05s;
+    }
+    .flash-overlay.flashing {
+      animation: flash 0.4s ease-out forwards;
+    }
+    @keyframes flash {
+      0% { opacity: 0.9; }
+      100% { opacity: 0; }
+    }
+
+    /* ── Controls Panel ── */
+    .controls {
+      margin: 16px 20px 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Type + Save row */
+    .row-inline {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Dropdown */
+    .select-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .select-wrap select {
+      width: 100%;
+      appearance: none;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 11px 40px 11px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .select-wrap select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,229,160,0.12);
+    }
+
+    .select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--muted);
+      pointer-events: none;
+    }
+
+    /* Toggle switch */
+    .toggle-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .toggle-label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .toggle {
+      position: relative;
+      width: 46px;
+      height: 26px;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 100px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.25s, border-color 0.25s;
+    }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), background 0.25s;
+      pointer-events: none;
+    }
+
+    .toggle input:checked ~ .toggle-track {
+      background: rgba(0,229,160,0.15);
+      border-color: var(--accent);
+    }
+
+    .toggle input:checked ~ .toggle-thumb {
+      transform: translateX(20px);
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(0,229,160,0.5);
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 -18px;
+    }
+
+    /* Snap + Submit buttons */
+    .btn-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    /* Ripple */
+    .btn::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      transform: scale(0);
+      width: 100px; height: 100px;
+      top: 50%; left: 50%;
+      margin: -50px;
+      transition: transform 0.4s, opacity 0.4s;
+      opacity: 0;
+    }
+    .btn:active::after { transform: scale(3); opacity: 0; transition: 0s; }
+
+    .btn-snap {
+      background: var(--surface2);
+      border: 1.5px solid rgba(255,77,109,0.4);
+      color: var(--snap-red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-snap:hover { border-color: var(--snap-red); box-shadow: 0 0 20px rgba(255,77,109,0.15); }
+
+    .btn-submit {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #0d0f14;
+      box-shadow: 0 4px 24px rgba(0,229,160,0.25);
+    }
+
+    .btn-submit:hover { filter: brightness(1.08); box-shadow: 0 6px 30px rgba(0,229,160,0.35); }
+
+    .btn-submit:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+      filter: none;
+    }
+
+    /* Snap indicator */
+    .snap-indicator {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: var(--accent);
+      font-weight: 500;
+      padding: 6px 10px;
+      background: rgba(0,229,160,0.08);
+      border-radius: 8px;
+      border: 1px solid rgba(0,229,160,0.2);
+    }
+
+    .snap-indicator.show { display: flex; }
+
+    .snap-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── Zoom control ── */
+    .zoom-bar {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: rgba(13,15,20,0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px;
+      padding: 4px;
+      transition: opacity 0.3s;
+    }
+
+    .zoom-bar.hidden { opacity: 0; pointer-events: none; }
+
+    .zoom-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 1.2rem;
+      font-weight: 300;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .zoom-btn:active { background: rgba(255,255,255,0.1); }
+    .zoom-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .zoom-level {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 36px;
+      text-align: center;
+      letter-spacing: 0.02em;
+      padding: 0 2px;
+    }
+
+    /* Retake link */
+    .retake {
+      display: none;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-color: transparent;
+      transition: color 0.2s, text-decoration-color 0.2s;
+    }
+    .retake:hover { color: var(--text); text-decoration-color: var(--text); }
+    .retake.show { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <header>
+    <span class="brand">PlateScan</span>
+    <div class="status-dot" id="statusDot"></div>
+  </header>
+
+  <!-- Viewfinder -->
+  <div class="viewfinder-wrap" id="viewfinderWrap">
+    <video id="camera" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+
+    <div class="corner-overlay">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+    </div>
+
+    <div class="scan-line" id="scanLine"></div>
+    <div class="flash-overlay" id="flashOverlay"></div>
+
+    <!-- Zoom control -->
+    <div class="zoom-bar" id="zoomBar">
+      <button class="zoom-btn" id="zoomOut" type="button" title="Zoom out">−</button>
+      <span class="zoom-level" id="zoomLevel">1×</span>
+      <button class="zoom-btn" id="zoomIn" type="button" title="Zoom in">+</button>
+    </div>
+
+    <div class="cam-error" id="camError">
+      <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72M15.75 10.5H9m6.75 0V3.75m-6.75 6.75L4.28 5.78M9 10.5V3.75M9 10.5c0 3.314-2.686 6-6 6M15 10.5c0 3.314 2.686 6 6 6M3 16.5h18"/>
+      </svg>
+      Camera unavailable
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+
+    <div class="row-inline">
+      <!-- Vehicle type dropdown -->
+      <div class="select-wrap">
+        <select id="vehicleType" name="type">
+          <option value="" disabled selected>Select type…</option>
+          <option value="car">Car</option>
+          <option value="2wheeler">2 Wheeler</option>
+          <option value="bus_truck">Bus / Truck</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <!-- Save to DB toggle -->
+      <div class="toggle-group">
+        <span class="toggle-label">Save to DB</span>
+        <label class="toggle">
+          <input type="checkbox" id="saveToDB" name="save_to_db" value="1"/>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Snap indicator -->
+    <div class="snap-indicator" id="snapIndicator">
+      <div class="snap-dot"></div>
+      Frame captured — ready to submit
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-snap" id="snapBtn" type="button">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <circle cx="12" cy="12" r="4"/>
+          <path stroke-linecap="round" d="M3 9a2 2 0 012-2h1l2-3h8l2 3h1a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+        </svg>
+        Snap
+      </button>
+
+      <span class="retake" id="retakeBtn">↺ Retake</span>
+
+      <form id="submitForm" action="/submit" method="POST" enctype="multipart/form-data">
+        <input type="hidden" id="imageData" name="image_data"/>
+        <input type="hidden" id="hiddenType" name="type"/>
+        <input type="hidden" id="hiddenSave" name="save_to_db"/>
+        <button class="btn btn-submit" id="submitBtn" type="submit" disabled>Submit</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const video     = document.getElementById('camera');
+  const canvas    = document.getElementById('canvas');
+  const ctx       = canvas.getContext('2d');
+  const snapBtn   = document.getElementById('snapBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  const retakeBtn = document.getElementById('retakeBtn');
+  const flash     = document.getElementById('flashOverlay');
+  const indicator = document.getElementById('snapIndicator');
+  const scanLine  = document.getElementById('scanLine');
+  const statusDot = document.getElementById('statusDot');
+  const camError  = document.getElementById('camError');
+
+  const zoomInBtn  = document.getElementById('zoomIn');
+  const zoomOutBtn = document.getElementById('zoomOut');
+  const zoomLabel  = document.getElementById('zoomLevel');
+  const zoomBar    = document.getElementById('zoomBar');
+
+  let zoomLevel  = 1;
+  let zoomMin    = 1;
+  let zoomMax    = 5;
+  let zoomStep   = 0.5;
+  let zoomTrack  = null;
+  let nativeZoom = false;
+
+  function updateZoomUI() {
+    zoomLabel.textContent = zoomLevel.toFixed(1).replace(/\.0$/, '') + '×';
+    zoomOutBtn.disabled = zoomLevel <= zoomMin;
+    zoomInBtn.disabled  = zoomLevel >= zoomMax;
+  }
+
+  function applyZoom() {
+    if (nativeZoom && zoomTrack) {
+      zoomTrack.applyConstraints({ advanced: [{ zoom: zoomLevel }] })
+        .catch(() => { applyCSSZoom(); });
+    } else {
+      applyCSSZoom();
+    }
+    updateZoomUI();
+  }
+
+  function applyCSSZoom() {
+    video.style.transform       = `scale(${zoomLevel})`;
+    video.style.transformOrigin = 'center center';
+  }
+
+  // ── Start rear camera ──
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: "environment" }
+  }).then(function(stream) {
+    video.srcObject = stream;
+    statusDot.style.background = 'var(--accent)';
+    statusDot.style.boxShadow  = '0 0 10px var(--accent)';
+
+    // Detect native zoom support
+    zoomTrack = stream.getVideoTracks()[0];
+    const caps = zoomTrack.getCapabilities ? zoomTrack.getCapabilities() : {};
+    if (caps.zoom) {
+      nativeZoom = true;
+      zoomMin  = caps.zoom.min  || 1;
+      zoomMax  = caps.zoom.max  || 5;
+      zoomStep = caps.zoom.step || 0.5;
+      zoomLevel = zoomMin;
+    }
+    updateZoomUI();
+  }).catch(function(err) {
+    console.error("Camera error: ", err);
+    camError.style.display = 'flex';
+    scanLine.style.display = 'none';
+    statusDot.style.background = 'var(--danger)';
+    statusDot.style.boxShadow  = '0 0 10px var(--danger)';
+    statusDot.style.animation  = 'none';
+  });
+
+  zoomInBtn.addEventListener('click', function() {
+    zoomLevel = Math.min(zoomMax, parseFloat((zoomLevel + zoomStep).toFixed(2)));
+    applyZoom();
+  });
+
+  zoomOutBtn.addEventListener('click', function() {
+    zoomLevel = Math.max(zoomMin, parseFloat((zoomLevel - zoomStep).toFixed(2)));
+    applyZoom();
+  });
+
+  // ── Snap ──
+  snapBtn.addEventListener('click', function() {
+    if (!video.srcObject) return;
+
+    canvas.width  = video.videoWidth  || 640;
+    canvas.height = video.videoHeight || 480;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Flash
+    flash.classList.remove('flashing');
+    void flash.offsetWidth;
+    flash.classList.add('flashing');
+
+    // Show canvas, hide video
+    video.style.display  = 'none';
+    canvas.style.display = 'block';
+    scanLine.style.display = 'none';
+
+    // Store image
+    document.getElementById('imageData').value = canvas.toDataURL('image/jpeg', 0.92);
+
+    snapped = true;
+    submitBtn.disabled = false;
+    indicator.classList.add('show');
+    retakeBtn.classList.add('show');
+    snapBtn.style.display = 'none';
+    zoomBar.classList.add('hidden');
+  });
+
+  // ── Retake ──
+  retakeBtn.addEventListener('click', function() {
+    video.style.display  = 'block';
+    canvas.style.display = 'none';
+    scanLine.style.display = 'block';
+    snapBtn.style.display  = '';
+    retakeBtn.classList.remove('show');
+    indicator.classList.remove('show');
+    submitBtn.disabled = true;
+    document.getElementById('imageData').value = '';
+    snapped = false;
+    zoomBar.classList.remove('hidden');
+  });
+
+  // ── Submit ──
+  document.getElementById('submitForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!snapped) return;
+
+    const type   = document.getElementById('vehicleType').value;
+    const saveDB = document.getElementById('saveToDB').checked ? '1' : '0';
+
+    if (!type) {
+      document.getElementById('vehicleType').style.borderColor = 'var(--danger)';
+      document.getElementById('vehicleType').focus();
+      return;
+    }
+
+    document.getElementById('hiddenType').value = type;
+    document.getElementById('hiddenSave').value = saveDB;
+
+    submitBtn.textContent = 'Processing…';
+    submitBtn.disabled = true;
+
+    this.submit(); // native form submit → redirects to output.html via Flask
+  });
+
+  document.getElementById('vehicleType').addEventListener('change', function() {
+    this.style.borderColor = '';
+  });
+</script>
+</body>
+</html>
