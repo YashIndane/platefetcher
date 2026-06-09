@@ -1,5 +1,4 @@
-
-FROM plb:v1
+FROM yashindane/platefetcher-llm-base:v1
 
 MAINTAINER Yash Indane
 
