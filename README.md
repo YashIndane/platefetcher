@@ -26,10 +26,7 @@
 Scan the number plate and get all the details of the vehicle!
 
 <div align="center">
-
-  ![platefetcher-gif](https://user-images.githubusercontent.com/53041219/207283343-5f3e9cdc-61d8-41bd-89c0-9b540d6b7570.gif) ![ras1](https://user-images.githubusercontent.com/53041219/207283447-a2d95a6e-ca48-423f-8394-ed59ca94160f.png)
-
-   
+   <img width="354" height="554" alt="image" src="https://github.com/user-attachments/assets/a7bb39cf-f143-4836-b818-ca9ca8e680d1" />
 </div>
 
 ## Usage
@@ -37,48 +34,26 @@ Scan the number plate and get all the details of the vehicle!
 ### 🛠️ Building the image
 
 ```
-$ sudo docker build --platform linux/arm64/v8 -t <IMAGE-NAME> .
+$ sudo docker build -t <IMAGE-NAME> .
 ```
 
 ### Pulling the image
 
 ```
-$ sudo podman/docker pull --platform linux/arm64/v8 docker.io/yashindane/demoplate:12
+$ sudo docker pull docker.io/yashindane/platefetcher-llm:v1
 ```
 
 ### ▶️ Running the container
 
-#### Using podman
-
 ```
-$ sudo podman run --network=host --platform linux/arm64/v8 -dit --device /dev/video0 --name <NAME> \
-  docker.io/yashindane/demoplate:12 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
-  --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
-```
-
-#### Using docker
-
-```
-$ sudo docker run --platform linux/arm64/v8 -dit -p <PORT>:2400 --device /dev/video0 --name <NAME> \
-  docker.io/yashindane/demoplate:12 --aak="<AWS_ACCESS_KEY>" --ask="<AWS_SECRET_KEY>" \
-  --region="<DEFAULT_REGION>" --bucketname="<BUCKET_NAME>" --user="<REG_CHECK_USER>"
-```
-
-### Optional arguments
-
-| Argument | Description |
-| --- | --- |
-| `--dbhost` | Host endpoint of DB instance (String) |
-| `--dbport` | Port at which DB service running (String) |
-| `--dbuser` | DB username (String) |
-| `--dbpass` | DB password min 8 characters (String) |
+$ sudo docker run -dit -p <PORT>:4000 --name <NAME> yashindane/platefetcher-llm:v1 --dbhost="<DB-HOSTNAME>" --dbuser="<DB-USERNAME>" --dbpass="<DB-PASSWORD>" --apikey="<OPENAI-APIKEY>" --rcuser="<REGCHECK-USER>"
+````
 
 ### Access
 
 | Tool | Path |
 | --- | --- |
-| `podman` | http://IP:2400/out |
-| `docker` | http://IP:PORT/out |
+| `docker` | http://IP:PORT/platescan |
 
 
 ### Prerequisites
@@ -141,18 +116,3 @@ $ sudo terraform plan
 $ sudo terraform apply -var="access_key=<AWS_ACCESS_KEY>" -var="secret_key=<AWS_SECRET_KEY>" -var="bucket_name=<S3_BUCKET_NAME>" \
   -var="identifier=<DB_IDENTIFIER>" -var="db_username=<DB_USERNAME>" -var="db_pass=<DB_PASSWORD>" -auto-approve
 ```
-
-## Working
-
-![dia](https://user-images.githubusercontent.com/53041219/196134284-fbabf6fb-1793-47c2-a190-ab565cff2233.png)
-
-1. Using image proccesing the region of interest, ie the plate is extracted.
-2. The detected plate image is uploaded to Amazon S3.
-3. AWS textract uses that image to extract the numbers.
-4. Raspberry Pi receives the extracted numbers.
-5. Using https://www.regcheck.org.uk API the Pi gets the vehical details using the plate number.
-6. The results are printed on the Phone.
-
-## Reference
-
-[1] Ravi Kiran Varma Pa*, Srikanth Gantaa, Hari Krishna Bb, Praveen SVSRKc "A Novel Method for Indian Vehicle Registration Number Plate Detection and Recognition using Image Processing Techniques", International Conference on Computational Intelligence and Data Science (ICCIDS 2019)
