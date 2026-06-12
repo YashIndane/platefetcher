@@ -103,4 +103,5 @@ class DBManager:
             self.DB.commit()
 
        except Exception as e:
+           print(e)
            raise RuntimeError("INSERT_DATA_FAILURE")
