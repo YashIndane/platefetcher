@@ -26,7 +26,7 @@
 Scan the number plate and get all the details of the vehicle!
 
 <div align="center">
-   <img width="354" height="554" alt="image" src="https://github.com/user-attachments/assets/a7bb39cf-f143-4836-b818-ca9ca8e680d1" />
+   <img width="846" height="646" alt="image" src="https://github.com/user-attachments/assets/b1818029-aa90-4318-88f0-95f50fba56af" />
 </div>
 
 ## Usage
