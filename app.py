@@ -14,8 +14,8 @@ import argparse
 
 from PIL import Image
 from typing import Dict
-from src.db import DBManager
 from tenacity import RetryError
+from src.db_pool import DBManager
 from src.vehicle_parser import fetch_and_parse
 from src.extract_reg_number_multi import extract
 from flask import Flask, request, render_template
