@@ -40,13 +40,13 @@ $ sudo docker build -t <IMAGE-NAME> .
 ### Pulling the image
 
 ```
-$ sudo docker pull docker.io/yashindane/platefetcher-llm:v1
+$ sudo docker pull docker.io/yashindane/platefetcher-llm:v2
 ```
 
 ### ▶️ Running the container
 
 ```
-$ sudo docker run -dit -p <PORT>:4000 --name <NAME> yashindane/platefetcher-llm:v1 --dbhost="<DB-HOSTNAME>" --dbuser="<DB-USERNAME>" --dbpass="<DB-PASSWORD>" --apikey="<OPENAI-APIKEY>" --rcuser="<REGCHECK-USER>"
+$ sudo docker run -dit -p <PORT>:4000 --name <NAME> yashindane/platefetcher-llm:v2 --dbhost="<DB-HOSTNAME>" --dbuser="<DB-USERNAME>" --dbpass="<DB-PASSWORD>" --apikey="<OPENAI-APIKEY>" --rcuser="<REGCHECK-USER>"
 ````
 
 ### Access
